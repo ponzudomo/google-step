@@ -1,0 +1,31 @@
+# 各ファイルの制約情報
+各入力ファイルから抽出した制約条件です。
+
+=======================================
+File: words.txt
+---------------------------------------
+Number of elements: 84093
+Longest word length: 21
+Maximum frequency of most frequent alphabet: 6
+
+=======================================
+File: small.txt
+---------------------------------------
+Number of elements: 10
+Longest word length: 16
+Maximum frequency of most frequent alphabet: 5
+
+=======================================
+File: medium.txt
+---------------------------------------
+Number of elements: 1000
+Longest word length: 16
+Maximum frequency of most frequent alphabet: 7
+
+=======================================
+File: large.txt
+---------------------------------------
+Number of elements: 10000
+Longest word length: 36
+Maximum frequency of most frequent alphabet: 9
+
