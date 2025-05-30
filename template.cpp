@@ -13,9 +13,8 @@
 using namespace std;
 #include <atcoder/all>
 using namespace atcoder;
-// まだ入れてなーい
-// #include <boost/dynamic_bitset.hpp>
-// using namespace boost;
+#include <boost/dynamic_bitset.hpp>
+using namespace boost;
 
 // define
 #define fore(x, a) for (auto &x : a)

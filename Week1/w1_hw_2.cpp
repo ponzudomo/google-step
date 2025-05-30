@@ -10,6 +10,10 @@
  * それぞれの単語について、文字の出現回数をa-z分26種類管理
  *  → 26種類のアルファベット全てにおいて、出現回数がrandom_wordを下回る辞書内の単語を探す
  * そこからスコアが最も高いものを出力
+ * 
+ * @todo
+ * 方針が固まりきっていない 
+ * - 構造体の使い方がよくわかっていなさそうなので、他の人のコードを参考にひとまず疑似コードを書いてみる
  */
 
 
@@ -67,6 +71,8 @@ struct Word {
     }
 
     /// @brief スコアを計算する関数
+    /// @param map<char, int> &scores_of_char 各文字のスコアを格納したマップ
+    /// @note 辞書の単語に含まれる文字の出現回数と、scores_of_charを掛け合わせてスコアを計算
     /// @return int スコア
     int calculate_score(map<char, int> &scores_of_char) {
         int score = 0;
