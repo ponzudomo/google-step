@@ -12,7 +12,7 @@
  * そこからスコアが最も高いものを出力
  * 
  * @todo
- * 方針が固まりきっていない 
+ * 方針が固まりきっていない
  * - 構造体の使い方がよくわかっていなさそうなので、他の人のコードを参考にひとまず疑似コードを書いてみる
  */
 
@@ -47,51 +47,28 @@ struct Init { Init() { ios::sync_with_stdio(0); cin.tie(0); } }init;
 
 /// @struct Word
 /// @brief 単語を表す構造体
-/// @note actual_word(string), score_of_word(int), count_char(map<char, int>), contains(boolの関数)
+/// @note actual_word(string), score_of_word(int), count_char(vector<int>)
 struct Word {
     string actual_word; // 単語そのもの
     int score_of_word;
-    map<char, int> count_char;
+    // map<char, int> count_char;
+    /// @brief 文字の出現回数を累積和で管理
+    vector<int> count_char; 
 
-    Word(int score_of_word, map<char, int> count_char) : score_of_word(score_of_word), count_char(count_char) {}
-
-    /// @brief その単語から辞書内の単語が作れるかどうか
-    /// @param Word dictionary_word 辞書の単語
-    /// @return true of false
-    bool contains(const Word &dictionary_word) {
-        // 辞書の単語がrandom_wordに含まれるかどうかを確認
-        for (const auto &pair : dictionary_word.count_char) {
-            char c = pair.first;
-            int count = pair.second;
-            if (!count_char.contains(c) ||  count_char[c] < count) {
-                return false; // random_wordに必要な文字数が足りない
-            }
-        }
-        return true; // 全ての文字が足りている
-    }
+    Word(int score_of_word, vector<int> count_char) : score_of_word(score_of_word), count_char(count_char) {}
 
     /// @brief スコアを計算する関数
     /// @param map<char, int> &scores_of_char 各文字のスコアを格納したマップ
     /// @note 辞書の単語に含まれる文字の出現回数と、scores_of_charを掛け合わせてスコアを計算
-    /// @return int スコア
-    int calculate_score(map<char, int> &scores_of_char) {
+    /// @return int score_of_word
+    int calculate_score(vector<int> &scores_of_char) {
         int score = 0;
-        for (const auto &pair : count_char) {
-            char c = pair.first;
-            int count = pair.second;
-            score += scores_of_char[c] * count; // 各文字のスコアを計算
+        rep(i, 26) { // a-zの文字数分ループ
+            score += scores_of_char['a'+i] * count_char[i]; // 各文字のスコアを計算
         }
         return score;
     }
 
-    /// @brief actual_wordに含まれるアルファベットの数を数える関数
-    /// @return 何も返さない count_charをいじる
-    void get_count_char() const {
-        for (char c : actual_word) {
-            if(count_char.contains(c)) count_char[c]++;
-            else count_char[c] = 1; // 初めて出現した文字は1回目
-        }
-    }
 
 };
 
@@ -118,7 +95,6 @@ vs load_files(const string &filepath) {
 
     return words;
 }
-
 
 
 int main(int argc, char* argv[]) {
