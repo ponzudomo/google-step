@@ -11,7 +11,7 @@ Google STEP 2025 の
 
 
 # リポジトリの構造
-## 
+## 大枠
 📂 .vscode : 環境周りの設定ファイル
 📂 note : 授業のノートや学習の振り返りなど、後から見返す簡易的なメモ
 📂 Week ﾎﾆｬﾗﾗ : 各週の具体的な学習記録 / 宿題
@@ -25,5 +25,12 @@ Google STEP 2025 の
 🎮 w(数字)_hw(数字).cpp : week(数字)のhomework(数字)を解いたもの
 
 ## メンターさんに確認していただきたいところ
+今週は以下の5ファイルになります🙇‍♀️ Office Hourまでになんとか更新されている予定です🙇‍♀️
+- [broccoli.cpp](https://github.com/ponzudomo/google-step/blob/main/Week2/broccoli.cpp) : 授業中に解いた例題
+- [w2_hw1.cpp](https://github.com/ponzudomo/google-step/blob/main/Week2/w2_hw1.cpp) : HW1(ハッシュテーブルの実装)
+- [w2_hw2.md](https://github.com/ponzudomo/google-step/blob/main/Week2/w2_hw2.md) : HW2 (記述問題)
+- [w2_hw34.cpp](https://github.com/ponzudomo/google-step/blob/main/Week2/w2_hw34.cpp) : HW3, 4 (記述+実装)
+- [w2_extra.cpp](https://github.com/ponzudomo/google-step/blob/main/Week2/w2_extra.cpp) : harakenさんがSlackで出していた追加問題
+
 
 
