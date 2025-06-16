@@ -21,11 +21,11 @@ Google STEP 2025 の　
 └── 📂 Week(1-7) : 各週の具体的な学習記録, 宿題 /　  
 　　　├── 📕 README.md : 宿題の進捗, 説明, 補足　  
 　　　├── 📂 HW : 宿題がまとまっているフォルダ /　  
-　　　│　　└── 📄 problem_statement.txt : 問題一覧　  
-　　　│　　└── 📄 constraints.txt : 問題の制約, 入力データの中身をC++に要約させたもの　  
+　　　│　　└── 📄 problem_statement.txt : 問題と実装方針一覧　  
 　　　│　　└── 🎮 HW(1-4).(cpp/md) : 個別の宿題　  
 　　　├── 📂 input : 入力データのファイル一覧　  
 　　　├── 📁 output : 出力ファイル一覧, 標準出力はすぐ見失うので出力ファイルを作ることが多い　  
+　　　│　　└── 📄 constraints.txt : 問題の制約, 入力データの中身をC++に要約させたもの (あれば)　  
 　　　├── 🎮 excercise.cpp : 授業中に扱った例題について、実際に実装してみたもの　  
 　　　└── 🎮 extra.cpp : 追加課題など、宿題の範囲に含まれないもの　   
 　  
@@ -36,7 +36,7 @@ Google STEP 2025 の　
   
 にその週確認していただきたいものがまとめてあります！　  
 宿題の添削時は、まず各週のREAD.mdをご覧ください。　  
-今週のものは[こちら](https://github.com/ponzudomo/google-step/blob/main/Week3/README.md)　  
+今週のものは[こちら](https://github.com/ponzudomo/google-step/blob/main/Week4/README.md)　  
 　  
 大まかな実装方針は、各週のproblem_statement.md(宿題の内容をひとまとめにしたファイル)に記載してあります。　  
 また個々のファイルの細かい実装方針や具体的なtodoについては、一箇所にまとめることはせず各ファイルに記載しています。　  
