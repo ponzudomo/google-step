@@ -1,52 +1,19 @@
 /**
  * @file
+ * Week4/HW/HW3.cpp
+ * 渋谷 → 池袋 の最長経路長問題
  * 
  * @brief
- * 
+ * 完全にHeuristic
+ * 1. ビームサーチっぽく探索して初期解を適当にいくつか生成 (速度重視)
+ * 2. ランダム初期解からGRASP風味に選定していく
+ * 3. Fold-Fulkerson法っぽく、逆流可能なグラフを作ってフローを流していく
+ * 4. 通ったPageの数とページランクをもとにセマンティックスコアを計算
+ * 5. 焼きなましていく🔥
  * 
  * @note
+ * chronoで時間を取得して実行時間をこちらで決める
+ * 最初は2-3分くらいで切り上げて、問題なさそうだったら徐々に時間を増やしていく
  *
  */
 
-
-// include
-#include <bits/stdc++.h>
-using namespace std;
-#include <atcoder/all>
-using namespace atcoder;
-#include <boost/dynamic_bitset.hpp>
-using namespace boost;
-
-// define
-#define fore(x, a) for (auto &x : a)
-#define rep(i, n) for (int i = 0; i < (int)(n); i++)
-#define repp(i, m, n) for (int i = (int)(m); i < (int)(n); i++)
-#define all(v) v.begin(), v.end()
-#define rall(v) v.rbegin(), v.rend()
-
-// typedef
-typedef long long ll;
-typedef unsigned long long ull;
-typedef pair<int, int> pii;
-typedef pair<ll, ll> pll;
-typedef vector<int> vi;
-typedef vector<ll> vll;
-typedef vector<string> vs;
-
-const double pi = 3.141592653589793238;
-const int inf = 1073741823;
-const ll infl = 1LL << 60;
-const int mod = 998244353;
-struct Init { Init() { ios::sync_with_stdio(0); cin.tie(0); } }init;
-
-
-/// @brief 
-/// @param
-/// @return 
-int func() {
-    return 0;
-}
-
-int main() {
-    return 0;
-}
