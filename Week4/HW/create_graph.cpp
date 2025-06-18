@@ -19,17 +19,26 @@
 
 
 /// @brief ノード(Page)同士を繋ぐエッジ(Link)の構造体
-/// @note Graph[Page]にLinkを置いていきたい(posはindexにしたい)ので、ひとまず行き先だけ
+/// @note Graph[Page.id]にLinkを置いておきたい(リンク元のページはindexにしたい)ので、ひとまず行き先だけ
 struct Link {
     Page to;
+    long long flow_cap; // エッジに流せる残量 初期値1, フローを流したら0
 
+    /// @brief 逆辺のGraph内のindex 
+    long long rev_link_index;
+    // Graph[Page.id][rev_link_index] = Link(to=Page, flow_cap=0, rev_link_index=index)
 };
 
+/// @brief ノード(Page)の構造体
+/// @param 
 struct Page {
     long long id;
     string title;
+    double pagerank;
 };
 
+/// @brief 
+/// @note Graph[Page_A.id][index] = ページAにおける、index番目のLink
 struct Graph {
 
 };
