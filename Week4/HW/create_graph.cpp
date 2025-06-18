@@ -13,15 +13,21 @@
  * 使いづらかったらもう少し平面的な構造にする
  * 
  * @todo
- * - 
+ * - HW3で使うので、最終的にはFold-Fulkersonっぽく逆流可能なグラフを作りたい
  * 
  */
 
- 
+
+/// @brief ノード(Page)同士を繋ぐエッジ(Link)の構造体
+/// @note Graph[Page]にLinkを置いていきたい(posはindexにしたい)ので、ひとまず行き先だけ
 struct Link {
+    Page to;
+
 };
 
 struct Page {
+    long long id;
+    string title;
 };
 
 struct Graph {
