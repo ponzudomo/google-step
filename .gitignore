@@ -1,2 +1,3 @@
-# inputデカすぎたので
-./Week4/input/
+# デカすぎデータセットをgit管理から除外
+Week4/input/wikipedia_dataset/*.txt
+Week4/input/processed_dataset/*
