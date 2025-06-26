@@ -3,11 +3,10 @@
  * Week4/HW/main.cpp
  * 
  * @brief
- * 今のところ、枝刈りやページランクの計算(HW2)などを行い、processed_databaseを作るのが主目的
- * 関数動かしたりもするかも
+ * 
  * 
  * @note
- * 関数のテストを行う場所はまた違うところに作る
+ * 
  * 
  * @todo
  * - 
@@ -18,8 +17,6 @@
 // include
 #include <bits/stdc++.h>
 using namespace std;
-#include <atcoder/all>
-using namespace atcoder;
 #include <boost/dynamic_bitset.hpp>
 using namespace boost;
 #include "read_files.h"
@@ -50,6 +47,9 @@ struct Init { Init() { ios::sync_with_stdio(0); cin.tie(0); } }init;
 
 
 int main() {
-    
+    // 入力ファイル選択・グラフ作成
+    read_files();
+    // 最短経路探索
+    find_shortest_path("A", "F");
     return 0;
 }

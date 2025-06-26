@@ -42,10 +42,19 @@ struct Page {
 };
 
 
+/*
+ 
+ /// @brief Page名からIDを取得できるマップ
+ /// @note title_to_id[page_title] = id
+ map<string, long long> title_to_id;
 
-/// @brief Page名からIDを取得できるマップ
-/// @note title_to_id[page_title] = id
-map<string, long long> title_to_id;
+ OH:
+ title_to_id はたかだか2回しか呼び出さないので、mapで十分
+ 時間計算量よりも空間計算量の方が重い よく考えるとコスパが悪い
+ つい競プロの手癖でマップを用意してしまったが、よく考えると要らなかったかも
+ モジュール化みたいな考え方がまだ微妙
+ 
+*/
 
 /// @brief PageのIDからPage情報を取得できるマップ
 /// @note id_to_page[id] = Page
@@ -96,6 +105,9 @@ void read_files() {
     string base = "input/wikipedia_dataset/";
     string pages_file = base + size + "/pages.txt";
     string links_file = base + size + "/links.txt";
+
+    read_pages(pages_file);
+    read_links(links_file);
 
     cout << "Loaded " << id_to_page.size() << " pages and " << count_links << " links." << endl;
     return;

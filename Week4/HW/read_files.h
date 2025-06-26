@@ -10,11 +10,10 @@ struct Page {
     bool visited = false;
 };
 
-map<string, long long> title_to_id;
-map<long long, Page> id_to_page;
 void read_pages(const string& filename);
 
-map<long long, set<long long>> id_to_ids;
-void read_links(const string& filename);
+extern map<long long, set<long long>> id_to_ids;
+// extern map<string, long long> title_to_id; 消す
 
+void read_links(const string& filename);
 void read_files();
