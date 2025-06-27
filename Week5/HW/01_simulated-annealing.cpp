@@ -53,8 +53,8 @@ Route solve_greedy(const vector<City>& cities, const int& start_index) {
     vector<bool> visited_cities(city_count, false);
     visited_cities[start_index] = true; // スタート地点は訪問済み
 
-    // city_count回ループ
-    for (int i = 0; i < city_count; i++) {
+    // city_count-1回ループ
+    for (int i = 0; i < city_count-1; i++) {
         int nearest_index = 0; // 最も近いCityのindex
         double min_dist = double(inf); // 最も近いCityの距離
 
@@ -116,10 +116,10 @@ Route solve_simulated_annealing(const vector<City>& cities, const Route& greedy_
     /* 時間管理 */
     // nowで取得したやつは比較できないっぽい？
     auto start_time = chrono::system_clock::now();
-    const int time_limit = 5 * 60 * 1000; // 5分をミリ秒に変換
+    const int time_limit = 20 * 60 * 1000; // 20分をミリ秒に変換
 
     /* 温度管理 */
-    const double start_temperature = 5e3;
+    const double start_temperature = 5e4;
     const double end_temperature = 1e0;
     double current_temperature = start_temperature;
 
