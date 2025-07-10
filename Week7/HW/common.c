@@ -83,7 +83,7 @@ void my_remove_from_free_list(my_metadata_t *metadata, my_metadata_t *prev) {
  * Interfaces of malloc (DO NOT RENAME FOLLOWING FUNCTIONS!)
  */
 
-/// @brief heapを初期化する関数
+/// @brief 空き領域リストを初期化する関数
 /// @note 
 ///   mallocの仕組みを使い始める前に、heapの状態を初期化する関数
 ///   空きメモリリストを空の状態(ダミーノードのみ)にしている

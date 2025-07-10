@@ -1,10 +1,18 @@
-//
-// >>>> malloc challenge! <<<<
-//
-// Your task is to improve utilization and speed of the following malloc
-// implementation.
-// Initial implementation is the same as the one implemented in simple_malloc.c.
-// For the detailed explanation, please refer to simple_malloc.c.
+/**
+ * @file
+ * Week7/HW/free-list-bin-malloc.c
+ * 
+ * @brief
+ * Free Listを大きさ別に管理
+ * 
+ * @note
+ * - 断片化を防ぐために、Free Listを大きさ別に管理する
+ * - ベースはBest Fitのmalloc
+ * 
+ * @todo
+ * - hilkalium-san/malloc/malloc.c に適用させる前に関数名を元に戻す必要がある
+ * 
+ */
 
 #include <assert.h>
 #include <stdbool.h>
@@ -13,34 +21,56 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "common.c"
 
-//
-// Interfaces to get memory pages from OS
-//
+/**
+ * 下準備
+ */
 
-void *mmap_from_system(size_t size);
-void munmap_to_system(void *ptr, size_t size);
-
-//
-// Struct definitions
-//
-
-typedef struct my_metadata_t {
-  size_t size;
-  struct my_metadata_t *next;
-} my_metadata_t;
-
-typedef struct my_heap_t {
-  my_metadata_t *free_head;
-  my_metadata_t dummy;
-} my_heap_t;
-
-//
-// Static variables (DO NOT ADD ANOTHER STATIC VARIABLES!)
-//
-my_heap_t my_heap;
-
+/** 
+ * @brief Free List Binたち
+ * @note 
+ * [0]: 0-63バイト, [1]: 64-127バイト, [2]: 128-255バイト, 
+ * [3]: 256-511バイト, [4]: 512-1023バイト, [5]: 1024-2047バイト, 
+ * [6]: 2048-4095バイト, [7]: 4096-8191バイト, [8]: 8192-16383バイト, [9]: 16384以上
+ */
 my_heap_t free_list_bins[10];
+
+/// @brief my_add_to_free_list()のfree list bin版実装例
+/// @note 使い終わった、または余った分を「先頭に」追加
+/// @param metadata 追加するメタデータ
+void my_add_to_free_list_bin(my_metadata_t *metadata) {
+  int bin_index = get_bin_index(metadata->size);
+  assert(!metadata->next);
+  metadata->next = free_list_bins[bin_index].free_head;
+  free_list_bins[bin_index].free_head = metadata;
+}
+
+/// @brief my_remove_from_free_list()のfree list bin版実装例
+/// @note 割り当てたいメモリ領域を取り除く
+/// @param metadata 削除するメタデータ
+/// @param prev 前のメタデータ
+void my_remove_from_free_list_bin(my_metadata_t *metadata, my_metadata_t *prev) {
+  int bin_index = get_bin_index(metadata->size);
+  if (prev) {
+    prev->next = metadata->next;
+  } else {
+    free_list_bins[bin_index].free_head = metadata->next;
+  }
+  metadata->next = NULL;
+}
+
+/// @brief my_initialize()のfree list bin版実装例
+/// @note 
+///   mallocの仕組みを使い始める前に、heapの状態を初期化する関数
+///   空きメモリリストを空の状態(ダミーノードのみ)にしている
+void my_initialize_bin() {
+  for(int i = 0; i < 10; i++) {
+    free_list_bins[i].free_head = &free_list_bins[i].dummy;
+    free_list_bins[i].dummy.size = 0;
+    free_list_bins[i].dummy.next = NULL;
+  }
+}
 
 /**
  * @brief にぶたんでFree List Binのインデックスを計算する関数
@@ -69,69 +99,14 @@ int get_bin_index(size_t alloc_size) {
   return bin_index;
 }
 
-void my_add_to_free_list(my_metadata_t *metadata) {
-  int bin_index = get_bin_index(metadata->size);
-  assert(!metadata->next);
+/**
+ * mallocの実装
+ */
 
-  /// @brief 挿入位置の一つ前のメタデータを指すポインタ
-  /// @note metadataよりもアドレスが小さい
-  my_metadata_t *prev_metadata = NULL;
-
-  /// @brief 挿入位置の次のメタデータを指すポインタ
-  /// @note metadataよりもアドレスが大きい
-  my_metadata_t *next_metadata = free_list_bins[bin_index].free_head;
-
-  /// 挿入位置を見つける
-  while (next_metadata && (char *)next_metadata < (char *)metadata) {
-    prev_metadata = next_metadata;
-    next_metadata = next_metadata->next;
-  }
-  /// ここでprev_metadataとnext_metadataを使って、metadataを適切な位置に挿入する
-  if (prev_metadata) {
-    if ((char *)prev_metadata + prev_metadata->size + sizeof(my_metadata_t) == (char *)metadata) {
-      /// mergeする with previous metadata
-      prev_metadata->size += metadata->size + sizeof(my_metadata_t);
-      prev_metadata->next = next_metadata;
-      metadata = prev_metadata;
-    } else {
-      prev_metadata->next = metadata;
-    }
-  } else {
-    free_list_bins[bin_index].free_head = metadata;
-  }
-  if(next_metadata && (char *)metadata + metadata->size + sizeof(my_metadata_t) == (char *)next_metadata) {
-    /// mergeする with next metadata
-    metadata->size += next_metadata->size + sizeof(my_metadata_t);
-    metadata->next = next_metadata->next;
-  } else {
-    metadata->next = next_metadata;
-  }
-}
-
-void my_remove_from_free_list(my_metadata_t *metadata, my_metadata_t *prev) {
-  int bin_index = get_bin_index(metadata->size);
-  if (prev) {
-    prev->next = metadata->next;
-  } else {
-    free_list_bins[bin_index].free_head = metadata->next;
-  }
-  metadata->next = NULL;
-}
-
-//
-// Interfaces of malloc (DO NOT RENAME FOLLOWING FUNCTIONS!)
-//
-
-// This is called at the beginning of each challenge.
-void my_initialize() {
-  for(int i = 0; i < 10; i++) {
-    free_list_bins[i].free_head = &free_list_bins[i].dummy;
-    free_list_bins[i].dummy.size = 0;
-    free_list_bins[i].dummy.next = NULL;
-  }
-}
-
-void *my_malloc(size_t alloc_size) {
+/// @brief Free List Binを用いてBest Fit方式のメモリ割り当てを行う関数
+/// @param alloc_size 割り当てるメモリのサイズ
+/// @return 割り当てたメモリ領域のポインタ
+void *free_list_bin_malloc(size_t alloc_size) {
   /* 空き領域を探す(Best Fit) */
   int bin_index = get_bin_index(alloc_size);
 
@@ -178,9 +153,9 @@ void *my_malloc(size_t alloc_size) {
     alloc_metadata->size = buffer_size - sizeof(my_metadata_t);
     alloc_metadata->next = NULL;
     /// Add the memory region to the free list.
-    my_add_to_free_list(alloc_metadata);
+    my_add_to_free_list_bin(alloc_metadata);
     /// Now, try free_list_bin_malloc() again. This should succeed.
-    return my_malloc(alloc_size);
+    return free_list_bin_malloc(alloc_size);
   }
 
   /** 
@@ -198,7 +173,7 @@ void *my_malloc(size_t alloc_size) {
   size_t remaining_size = alloc_metadata->size - alloc_size;
 
   /// Remove the free slot from the free list.
-  my_remove_from_free_list(alloc_metadata, prev_metadata);
+  my_remove_from_free_list_bin(alloc_metadata, prev_metadata);
 
   /**
    * 当てがったメモリ領域が余ったら、貸しスペース一覧に追加する
@@ -220,12 +195,18 @@ void *my_malloc(size_t alloc_size) {
     remaining_metadata->size = remaining_size - sizeof(my_metadata_t);
     remaining_metadata->next = NULL;
     /// Add the remaining free slot to the free list.
-    my_add_to_free_list(remaining_metadata);
+    my_add_to_free_list_bin(remaining_metadata);
   }
   return alloc_ptr;
 }
 
-void my_free(void *alloc_ptr) {
+/**
+ * 後処理
+ */
+
+/// @brief my_free()のfree list bin版実装例
+/// @param alloc_ptr 解放するメモリ領域のポインタ
+void my_free_from_bin(void *alloc_ptr) {
   /*
    * Look up the metadata. The metadata is placed just prior to the object.
    *
@@ -235,17 +216,11 @@ void my_free(void *alloc_ptr) {
    */
   my_metadata_t *alloc_metadata = (my_metadata_t *)alloc_ptr - 1;
   /// 空きリストにぶち込む
-  my_add_to_free_list(alloc_metadata);
+  my_add_to_free_list_bin(alloc_metadata);
 }
-
 
 /// @brief 最後のクリーンアップ処理を行う
 void my_finalize() {
   // Nothing is here for now.
   // feel free to add something if you want!
-}
-
-void test() {
-  // Implement here!
-  assert(1 == 1); /* 1 is 1. That's always true! (You can remove this.) */
 }
