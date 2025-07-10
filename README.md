@@ -37,7 +37,7 @@ Google STEP 2025 の　
   
 にその週確認していただきたいものがまとめてあります！　  
 宿題の添削時は、まず各週のREAD.mdをご覧ください。　  
-今週のものは[こちら](https://github.com/ponzudomo/google-step/blob/main/Week4/README.md)　  
+今週のものは[こちら](https://github.com/ponzudomo/google-step/blob/main/Week7/README.md)　  
 　  
 大まかな実装方針は、各週のproblem_statement.md(宿題の内容をひとまとめにしたファイル)に記載してあります。　  
 また個々のファイルの細かい実装方針や具体的なtodoについては、一箇所にまとめることはせず各ファイルに記載しています。　  
