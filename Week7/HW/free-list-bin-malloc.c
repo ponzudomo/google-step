@@ -36,9 +36,11 @@
  */
 my_heap_t free_list_bins[10];
 
-/// @brief my_add_to_free_list()のfree list bin版実装例
-/// @note 使い終わった、または余った分を「先頭に」追加
-/// @param metadata 追加するメタデータ
+/**
+ * @brief my_add_to_free_list()のfree list bin版実装例
+ * @note 使い終わった、または余った分を「先頭に」追加
+ * @param metadata 追加するメタデータ
+ */
 void my_add_to_free_list_bin(my_metadata_t *metadata) {
   int bin_index = get_bin_index(metadata->size);
   assert(!metadata->next);
@@ -46,10 +48,12 @@ void my_add_to_free_list_bin(my_metadata_t *metadata) {
   free_list_bins[bin_index].free_head = metadata;
 }
 
-/// @brief my_remove_from_free_list()のfree list bin版実装例
-/// @note 割り当てたいメモリ領域を取り除く
-/// @param metadata 削除するメタデータ
-/// @param prev 前のメタデータ
+/** 
+ * @brief my_remove_from_free_list()のfree list bin版実装例
+ * @note 割り当てたいメモリ領域を取り除く
+ * @param metadata 削除するメタデータ
+ * @param prev 前のメタデータ
+ */
 void my_remove_from_free_list_bin(my_metadata_t *metadata, my_metadata_t *prev) {
   int bin_index = get_bin_index(metadata->size);
   if (prev) {
@@ -60,10 +64,12 @@ void my_remove_from_free_list_bin(my_metadata_t *metadata, my_metadata_t *prev) 
   metadata->next = NULL;
 }
 
-/// @brief my_initialize()のfree list bin版実装例
-/// @note 
-///   mallocの仕組みを使い始める前に、heapの状態を初期化する関数
-///   空きメモリリストを空の状態(ダミーノードのみ)にしている
+/** 
+ * @brief my_initialize()のfree list bin版実装例
+ * @note
+ *   mallocの仕組みを使い始める前に、heapの状態を初期化する関数
+ *   空きメモリリストを空の状態(ダミーノードのみ)にしている
+ */
 void my_initialize_bin() {
   for(int i = 0; i < 10; i++) {
     free_list_bins[i].free_head = &free_list_bins[i].dummy;
@@ -71,6 +77,7 @@ void my_initialize_bin() {
     free_list_bins[i].dummy.next = NULL;
   }
 }
+
 
 /**
  * @brief にぶたんでFree List Binのインデックスを計算する関数
@@ -82,6 +89,7 @@ void my_initialize_bin() {
  * [6]: 2048-4095バイト, [7]: 4096-8191バイト, [8]: 8192-16383バイト, [9]: 16384以上
  */
 int get_bin_index(size_t alloc_size) {
+  /*
   int left = 0, right = 9;
   int bin_index = 0;
   while (left <= right) {
@@ -97,21 +105,36 @@ int get_bin_index(size_t alloc_size) {
     }
   }
   return bin_index;
+  */
+
+  /// なんか怪しかったので愚直に変更
+  if (alloc_size <= 63) return 0;
+  if (alloc_size <= 127) return 1;
+  if (alloc_size <= 255) return 2;
+  if (alloc_size <= 511) return 3;
+  if (alloc_size <= 1023) return 4;
+  if (alloc_size <= 2047) return 5;
+  if (alloc_size <= 4095) return 6;
+  if (alloc_size <= 8191) return 7;
+  if (alloc_size <= 16383) return 8;
+  return 9;
 }
 
 /**
  * mallocの実装
  */
 
-/// @brief Free List Binを用いてBest Fit方式のメモリ割り当てを行う関数
-/// @param alloc_size 割り当てるメモリのサイズ
-/// @return 割り当てたメモリ領域のポインタ
+/**
+ * @brief Free List Binを用いてBest Fit方式のメモリ割り当てを行う関数
+ * @param alloc_size 割り当てるメモリのサイズ
+ * @return 割り当てたメモリ領域のポインタ
+ */
 void *free_list_bin_malloc(size_t alloc_size) {
   /* 空き領域を探す(Best Fit) */
   int bin_index = get_bin_index(alloc_size);
 
   /// @brief ここにthe best free slotの先頭のポインタを入れる
-  my_metadata_t *alloc_metadata = free_list_bins[bin_index].free_head;
+  my_metadata_t *alloc_metadata = NULL;
 
   /// @brief the best free slotの一つ前のmetadataのポインタ
   my_metadata_t *prev_metadata = NULL;
@@ -123,7 +146,8 @@ void *free_list_bin_malloc(size_t alloc_size) {
   my_metadata_t *prev_current_metadata = NULL;
 
   while (current_metadata) {
-    if (current_metadata->size < alloc_metadata->size) {
+    if (current_metadata->size > alloc_size && 
+        (alloc_metadata == NULL || current_metadata->size < alloc_metadata->size)) {
       alloc_metadata = current_metadata;
       prev_metadata = prev_current_metadata;
     }
@@ -136,7 +160,9 @@ void *free_list_bin_malloc(size_t alloc_size) {
    * and prev_metadata is the previous entry.
    */
 
-  /** 空き領域がなかった場合 */
+  /** 
+   * 空き領域がなかった場合 
+   */
   if (!alloc_metadata) {
     /**
      * There was no free slot available. We need to request a new memory region

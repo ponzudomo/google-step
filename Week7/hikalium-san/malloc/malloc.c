@@ -52,6 +52,7 @@ my_heap_t free_list_bins[10];
  * [6]: 2048-4095バイト, [7]: 4096-8191バイト, [8]: 8192-16383バイト, [9]: 16384以上
  */
 int get_bin_index(size_t alloc_size) {
+  /*
   int left = 0, right = 9;
   int bin_index = 0;
   while (left <= right) {
@@ -67,8 +68,37 @@ int get_bin_index(size_t alloc_size) {
     }
   }
   return bin_index;
+  */
+  
+  /// なんか怪しかったので愚直に変更
+  if (alloc_size <= 63) return 0;
+  if (alloc_size <= 127) return 1;
+  if (alloc_size <= 255) return 2;
+  if (alloc_size <= 511) return 3;
+  if (alloc_size <= 1023) return 4;
+  if (alloc_size <= 2047) return 5;
+  if (alloc_size <= 4095) return 6;
+  if (alloc_size <= 8191) return 7;
+  if (alloc_size <= 16383) return 8;
+  return 9;
 }
 
+void my_remove_from_free_list(my_metadata_t *metadata, my_metadata_t *prev) {
+  int bin_index = get_bin_index(metadata->size);
+  if (prev) {
+    prev->next = metadata->next;
+  } else {
+    free_list_bins[bin_index].free_head = metadata->next;
+  }
+  metadata->next = NULL;
+}
+
+/// @brief my_add_to_free_list()のmerge free list版実装例
+/// @note 
+///   ただの挿入(要素数+1) || 左右いずれかのfree listとmerge(±0) || 左右両方とmerge(-1)
+///   if(前と繋がるかな)とif(後ろと繋がるかな)で2回同じような操作をします
+/// @todo 後々二分探索木みたいにしたい
+/// @param metadata 追加するメタデータ
 void my_add_to_free_list(my_metadata_t *metadata) {
   int bin_index = get_bin_index(metadata->size);
   assert(!metadata->next);
@@ -76,6 +106,10 @@ void my_add_to_free_list(my_metadata_t *metadata) {
   /// @brief 挿入位置の一つ前のメタデータを指すポインタ
   /// @note metadataよりもアドレスが小さい
   my_metadata_t *prev_metadata = NULL;
+
+  /// @brief prevのprev
+  /// @note prev_metadataとmergeしてしまった場合、prevがこいつになる
+  my_metadata_t *prev_prev_metadata = NULL;
 
   /// @brief 挿入位置の次のメタデータを指すポインタ
   /// @note metadataよりもアドレスが大きい
@@ -93,6 +127,7 @@ void my_add_to_free_list(my_metadata_t *metadata) {
       prev_metadata->size += metadata->size + sizeof(my_metadata_t);
       prev_metadata->next = next_metadata;
       metadata = prev_metadata;
+      prev_metadata = prev_prev_metadata;
     } else {
       prev_metadata->next = metadata;
     }
@@ -106,16 +141,12 @@ void my_add_to_free_list(my_metadata_t *metadata) {
   } else {
     metadata->next = next_metadata;
   }
-}
 
-void my_remove_from_free_list(my_metadata_t *metadata, my_metadata_t *prev) {
-  int bin_index = get_bin_index(metadata->size);
-  if (prev) {
-    prev->next = metadata->next;
-  } else {
-    free_list_bins[bin_index].free_head = metadata->next;
+  /// もしmergeによってサイズがbinにそぐわないものになってしまったら、お引越し
+  if (metadata->size > (1 << (bin_index + 6))) {
+    my_remove_from_free_list(metadata, prev_metadata);
+    my_add_to_free_list(metadata);
   }
-  metadata->next = NULL;
 }
 
 //
@@ -136,7 +167,7 @@ void *my_malloc(size_t alloc_size) {
   int bin_index = get_bin_index(alloc_size);
 
   /// @brief ここにthe best free slotの先頭のポインタを入れる
-  my_metadata_t *alloc_metadata = free_list_bins[bin_index].free_head;
+  my_metadata_t *alloc_metadata = NULL;
 
   /// @brief the best free slotの一つ前のmetadataのポインタ
   my_metadata_t *prev_metadata = NULL;
@@ -148,7 +179,8 @@ void *my_malloc(size_t alloc_size) {
   my_metadata_t *prev_current_metadata = NULL;
 
   while (current_metadata) {
-    if (current_metadata->size < alloc_metadata->size) {
+    if (current_metadata->size > alloc_size && 
+        (alloc_metadata == NULL || current_metadata->size < alloc_metadata->size)) {
       alloc_metadata = current_metadata;
       prev_metadata = prev_current_metadata;
     }

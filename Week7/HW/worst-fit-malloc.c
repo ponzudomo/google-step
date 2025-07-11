@@ -26,7 +26,7 @@ void *worst_fit_malloc(size_t alloc_size) {
   /* 空き領域を探す(Worst Fit) */
 
   /// @brief ここにthe worst free slotの先頭のポインタを入れる
-  my_metadata_t *alloc_metadata = my_heap.free_head;
+  my_metadata_t *alloc_metadata = NULL;
 
   /// @brief the worst free slotの一つ前のmetadataのポインタ
   my_metadata_t *prev_metadata = NULL;
@@ -38,7 +38,8 @@ void *worst_fit_malloc(size_t alloc_size) {
   my_metadata_t *prev_current_metadata = NULL;
 
   while (current_metadata) {
-    if (current_metadata->size > alloc_metadata->size) {
+    if (current_metadata->size > alloc_size && 
+      (alloc_metadata == NULL || current_metadata->size > alloc_metadata->size)) {
       alloc_metadata = current_metadata;
       prev_metadata = prev_current_metadata;
     }

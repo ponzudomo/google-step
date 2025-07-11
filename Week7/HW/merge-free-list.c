@@ -40,6 +40,10 @@ void my_add_to_free_list_merge(my_metadata_t *metadata) {
   /// @note metadataよりもアドレスが小さい
   my_metadata_t *prev_metadata = NULL;
 
+  /// @brief prevのprev
+  /// @note prev_metadataとmergeしてしまった場合、prevがこいつになる
+  my_metadata_t *prev_prev_metadata = NULL;
+
   /// @brief 挿入位置の次のメタデータを指すポインタ
   /// @note metadataよりもアドレスが大きい
   my_metadata_t *next_metadata = free_list_bins[bin_index].free_head;
@@ -56,6 +60,7 @@ void my_add_to_free_list_merge(my_metadata_t *metadata) {
       prev_metadata->size += metadata->size + sizeof(my_metadata_t);
       prev_metadata->next = next_metadata;
       metadata = prev_metadata;
+      prev_metadata = prev_prev_metadata;
     } else {
       prev_metadata->next = metadata;
     }
@@ -68,5 +73,11 @@ void my_add_to_free_list_merge(my_metadata_t *metadata) {
     metadata->next = next_metadata->next;
   } else {
     metadata->next = next_metadata;
+  }
+
+  /// もしmergeによってサイズがbinにそぐわないものになってしまったら、お引越し
+  if (metadata->size > (1 << (bin_index + 6))) {
+    my_remove_from_free_list_bin(metadata, prev_metadata);
+    my_add_to_free_list_merge(metadata);
   }
 }
