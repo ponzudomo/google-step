@@ -50,6 +50,7 @@ void my_add_to_free_list_merge(my_metadata_t *metadata) {
 
   /// 挿入位置を見つける
   while (next_metadata && (char *)next_metadata < (char *)metadata) {
+    prev_prev_metadata = prev_metadata;
     prev_metadata = next_metadata;
     next_metadata = next_metadata->next;
   }

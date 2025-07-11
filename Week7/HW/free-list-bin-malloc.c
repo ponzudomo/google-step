@@ -12,6 +12,10 @@
  * @todo
  * - hilkalium-san/malloc/malloc.c に適用させる前に関数名を元に戻す必要がある
  * 
+ * @結果
+ * 
+ * 
+ * 
  */
 
 #include <assert.h>
@@ -209,7 +213,7 @@ void *free_list_bin_malloc(size_t alloc_size) {
     if (bin_index < 9) {
       bin_index++;
       alloc_metadata = find_free_slot(alloc_size, bin_index, &prev_metadata);
-      continue;
+      break;
     }
 
     /**
@@ -218,7 +222,7 @@ void *free_list_bin_malloc(size_t alloc_size) {
      */
 
     size_t buffer_size = 4096;
-    my_metadata_t *alloc_metadata = (my_metadata_t *)mmap_from_system(buffer_size);
+    alloc_metadata = (my_metadata_t *)mmap_from_system(buffer_size);
     alloc_metadata->size = buffer_size - sizeof(my_metadata_t);
     alloc_metadata->next = NULL;
     /// Add the memory region to the free list.

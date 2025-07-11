@@ -117,6 +117,7 @@ void my_add_to_free_list(my_metadata_t *metadata) {
 
   /// 挿入位置を見つける
   while (next_metadata && (char *)next_metadata < (char *)metadata) {
+    prev_prev_metadata = prev_metadata;
     prev_metadata = next_metadata;
     next_metadata = next_metadata->next;
   }
@@ -134,10 +135,12 @@ void my_add_to_free_list(my_metadata_t *metadata) {
   } else {
     free_list_bins[bin_index].free_head = metadata;
   }
-  if(next_metadata && (char *)metadata + metadata->size + sizeof(my_metadata_t) == (char *)next_metadata) {
-    /// mergeする with next metadata
-    metadata->size += next_metadata->size + sizeof(my_metadata_t);
-    metadata->next = next_metadata->next;
+  if (next_metadata) {
+    if ((char *)metadata + metadata->size + sizeof(my_metadata_t) == (char *)next_metadata) {
+      /// mergeする with next metadata
+      metadata->size += next_metadata->size + sizeof(my_metadata_t);
+      metadata->next = next_metadata->next;
+    }
   } else {
     metadata->next = next_metadata;
   }
@@ -239,7 +242,7 @@ void *my_malloc(size_t alloc_size) {
       continue;
     }
     size_t buffer_size = 4096;
-    my_metadata_t *alloc_metadata = (my_metadata_t *)mmap_from_system(buffer_size);
+    alloc_metadata = (my_metadata_t *)mmap_from_system(buffer_size);
     alloc_metadata->size = buffer_size - sizeof(my_metadata_t);
     alloc_metadata->next = NULL;
     /// Add the memory region to the free list.
