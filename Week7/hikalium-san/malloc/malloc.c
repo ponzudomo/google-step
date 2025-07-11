@@ -162,9 +162,21 @@ void my_initialize() {
   }
 }
 
-void *my_malloc(size_t alloc_size) {
-  /* 空き領域を探す(Best Fit) */
-  int bin_index = get_bin_index(alloc_size);
+
+/**
+ * @brief 空き領域を探す関数
+ * @note 
+ *   free list bin対応、Best Fit方式で空き領域を探索
+ *   Cはpairがないらしい？ので、引数をいじる形で値を渡す
+ *   さらにポインタの参照渡しはなんかヤバそうだったのでダブルポインタを使う
+ * @param alloc_size 割り当てるメモリのサイズ
+ * @param bin_index どのbinから探すか
+ * @param prev_metadata_ptr prev_metadataのポインタ
+ * @return alloc_metadata
+ * @return はしないけどprev_metadata_ptrをいじる
+ */
+my_metadata_t *find_free_slot(size_t alloc_size, int bin_index, 
+                              my_metadata_t **prev_metadata_ptr) {
 
   /// @brief ここにthe best free slotの先頭のポインタを入れる
   my_metadata_t *alloc_metadata = NULL;
@@ -188,13 +200,29 @@ void *my_malloc(size_t alloc_size) {
     current_metadata = current_metadata->next;
   }
 
+  *prev_metadata_ptr = prev_metadata;
+  return alloc_metadata;
+}
+
+void *my_malloc(size_t alloc_size) {
+  /* 空き領域を探す(Best Fit) */
+  int bin_index = get_bin_index(alloc_size);
+
+  /// @brief ここにthe best free slotの先頭のポインタを入れる
+  my_metadata_t *alloc_metadata = NULL;
+
+  /// @brief the best free slotの一つ前のmetadataのポインタ
+  my_metadata_t *prev_metadata = NULL;
+
+  alloc_metadata = find_free_slot(alloc_size, bin_index, &prev_metadata);
+
   /**
    * now, alloc_metadata points to the best free slot
    * and prev_metadata is the previous entry.
    */
 
   /** 空き領域がなかった場合 */
-  if (!alloc_metadata) {
+  while (!alloc_metadata) {
     /**
      * There was no free slot available. We need to request a new memory region
      * from the system by calling mmap_from_system().
@@ -205,6 +233,11 @@ void *my_malloc(size_t alloc_size) {
      *     <---------------------->
      *            buffer_size
      */
+    if (bin_index < 9) {
+      bin_index++;
+      alloc_metadata = find_free_slot(alloc_size, bin_index, &prev_metadata);
+      continue;
+    }
     size_t buffer_size = 4096;
     my_metadata_t *alloc_metadata = (my_metadata_t *)mmap_from_system(buffer_size);
     alloc_metadata->size = buffer_size - sizeof(my_metadata_t);

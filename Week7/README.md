@@ -28,10 +28,12 @@
 ---
 
 # 今週やったこと, 進捗　  
-- First Fit, Worst Fitのmallocを実装した　  
-- Free List Binみたいなのを実装した はずが `[run] Killed: 9` (Out of Memory) に (たぶんbinの分け方の問題)　  
+- first fit, worst fitのmallocを実装した　  
+- free list binみたいなのを実装した はずが `[run] Killed: 9` (Out of Memory) に (たぶんbinの分け方の問題)　  
 - あわてて `merge-free-list.c` を書いた　  
 - 永遠にrunが終わらないのでひとまず提出します すみません　  
+- binへの空き地挿入時とbinからの借入時にサイズ判定をしていなかったので追加 まだrunは終わらない　  
+- free list binの管理にて、要求サイズに理想的なbinしか渡していなかったので、適切な空き地が見つからなかった場合により大きなbinを探しに行けるように修正 runは終わるも `Abort trap: 6` (An allocated object is broken)　  
 　  
 # メンターさんに確認していただきたいところ　  
 ### 宿題
